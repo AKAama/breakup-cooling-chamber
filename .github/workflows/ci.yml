@@ -60,8 +60,6 @@ jobs:
           tags: |
             crpi-3xux8vqn35fw00z9.cn-shanghai.personal.cr.aliyuncs.com/project_hub/breakup-cooling-chamber:latest
             crpi-3xux8vqn35fw00z9.cn-shanghai.personal.cr.aliyuncs.com/project_hub/breakup-cooling-chamber:${{ github.sha }}
-          cache-from: type=registry,ref=crpi-3xux8vqn35fw00z9.cn-shanghai.personal.cr.aliyuncs.com/project_hub/breakup-cooling-chamber:buildcache
-          cache-to: type=registry,ref=crpi-3xux8vqn35fw00z9.cn-shanghai.personal.cr.aliyuncs.com/project_hub/breakup-cooling-chamber:buildcache,mode=max
 
       - name: Deploy on server
         uses: appleboy/ssh-action@v1
