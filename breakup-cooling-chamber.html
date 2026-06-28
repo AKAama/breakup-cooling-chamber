@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>分手冷静室 · 让你别在深夜做决定</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  :root {
+    --indigo: #4F46E5;
+    --indigo-soft: #818CF8;
+    --indigo-deep: #3730A3;
+    --paper: #FAFAF7;
+    --paper-deep: #F0EFE8;
+    --ink: #1F1F2E;
+    --ink-soft: #52525B;
+    --ink-faint: #A1A1AA;
+    --warm: #F59E0B;
+    --warm-deep: #D97706;
+    --line: #E4E4E7;
+  }
+  
+  html { scroll-behavior: smooth; }
+  
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.75;
+    font-weight: 400;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 80px 24px;
+    position: relative;
+    background: 
+      radial-gradient(ellipse at 50% 0%, rgba(79,70,229,0.08) 0%, transparent 50%),
+      linear-gradient(180deg, var(--paper) 0%, var(--paper-deep) 100%);
+    overflow: hidden;
+  }
+  
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+  }
+  
+  /* 抽象主视觉 - 月相 + 心形融化 */
+  .hero-mark {
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 32px;
+    display: block;
+    opacity: 0;
+    animation: fadeUp 1s 0.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(79,70,229,0.15);
+    color: var(--indigo-deep);
+    border-radius: 100px;
+    font-size: 12px;
+    margin-bottom: 32px;
+    font-weight: 500;
+    animation: fadeUp 0.8s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+  }
+  
+  .badge .dot {
+    width: 6px;
+    height: 6px;
+    background: var(--warm);
+    border-radius: 50%;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  
+  .hero h1 {
+    font-size: clamp(36px, 7vw, 64px);
+    font-weight: 700;
+    letter-spacing: -1px;
+    margin-bottom: 24px;
+    line-height: 1.15;
+    color: var(--ink);
+    animation: fadeUp 1s 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+  }
+  
+  .hero .tagline {
+    font-size: clamp(16px, 2.4vw, 19px);
+    color: var(--ink-soft);
+    margin-bottom: 40px;
+    max-width: 540px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.65;
+    animation: fadeUp 1s 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+  }
+  
+  .hero .positioning {
+    display: inline-block;
+    padding: 12px 22px;
+    border-radius: 100px;
+    background: var(--ink);
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 16px;
+    animation: fadeUp 1s 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+  }
+  
+  .scroll-hint {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    color: var(--ink-faint);
+    animation: float 2.5s ease-in-out infinite;
+    font-size: 11px;
+    letter-spacing: 4px;
+  }
+  
+  section {
+    padding: 100px 24px;
+    max-width: 920px;
+    margin: 0 auto;
+    position: relative;
+  }
+  
+  .section-label {
+    font-size: 12px;
+    color: var(--indigo);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 1.5px;
+  }
+  
+  .section-label::before {
+    content: "";
+    width: 16px;
+    height: 2px;
+    background: var(--indigo);
+    border-radius: 2px;
+  }
+  
+  h2 {
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 32px;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  
+  h2 .hl {
+    background: linear-gradient(180deg, transparent 65%, rgba(245,158,11,0.3) 65%);
+    padding: 0 2px;
+  }
+  
+  h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--ink);
+    letter-spacing: -0.2px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  h3 .icon {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    color: var(--indigo);
+  }
+  
+  p {
+    font-size: 16px;
+    color: var(--ink-soft);
+    margin-bottom: 16px;
+  }
+  
+  p strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  
+  /* PAIN SECTION */
+  .pain {
+    background: var(--paper-deep);
+    max-width: none;
+  }
+  
+  .pain-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  
+  .pain-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 48px;
+  }
+  
+  @media (max-width: 860px) {
+    .pain-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  
+  @media (max-width: 520px) {
+    .pain-grid { grid-template-columns: 1fr; }
+  }
+  
+  .pain-card {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 24px 22px;
+    transition: all 0.3s ease;
+  }
+  
+  .pain-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--indigo-soft);
+    box-shadow: 0 10px 30px -15px rgba(79,70,229,0.2);
+  }
+  
+  .pain-card .icon-wrap {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(79,70,229,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+  
+  .pain-card .icon-wrap svg {
+    width: 22px;
+    height: 22px;
+    color: var(--indigo);
+    stroke-width: 1.6;
+  }
+  
+  .pain-card h3 {
+    font-size: 15px;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  
+  .pain-card h3 .icon { display: none; }
+  
+  .pain-card p {
+    font-size: 13.5px;
+    margin-bottom: 0;
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+  
+  /* SOLUTION - 四种陪伴方式 */
+  .solution {
+    background: white;
+    max-width: none;
+  }
+  
+  .solution-inner { max-width: 920px; margin: 0 auto; }
+  
+  .solution-intro {
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--ink-soft);
+    max-width: 640px;
+    margin-bottom: 48px;
+  }
+  
+  .mode-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 32px 28px;
+    margin-bottom: 16px;
+    transition: all 0.3s;
+  }
+  
+  .mode-card:hover {
+    border-color: var(--indigo-soft);
+    background: white;
+    box-shadow: 0 10px 30px -15px rgba(79,70,229,0.15);
+  }
+  
+  .mode-card .mode-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    background: rgba(79,70,229,0.08);
+    color: var(--indigo);
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+  
+  .mode-card h4 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--ink);
+    letter-spacing: -0.2px;
+  }
+  
+  .mode-card p {
+    color: var(--ink-soft);
+    font-size: 14.5px;
+    line-height: 1.7;
+    margin-bottom: 0;
+  }
+  
+  /* USERS */
+  .users {
+    background: var(--paper-deep);
+    max-width: none;
+  }
+  
+  .users-inner { max-width: 920px; margin: 0 auto; }
+  
+  .user-list {
+    list-style: none;
+    margin-top: 32px;
+  }
+  
+  .user-list li {
+    padding: 22px 0;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+  }
+  
+  .user-list li:last-child { border-bottom: none; }
+  
+  .user-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: white;
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .user-icon svg {
+    width: 20px;
+    height: 20px;
+    color: var(--indigo);
+    stroke-width: 1.6;
+  }
+  
+  .user-text strong {
+    color: var(--ink);
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 600;
+    font-size: 15.5px;
+  }
+  
+  .user-text span {
+    color: var(--ink-soft);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  
+  /* FEATURES */
+  .features { background: var(--paper); }
+  
+  .feature {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 28px;
+    padding: 36px 0;
+    border-bottom: 1px solid var(--line);
+    align-items: start;
+  }
+  
+  .feature:last-child { border-bottom: none; }
+  
+  .feature-num {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 44px;
+    font-weight: 400;
+    color: var(--warm);
+    line-height: 1;
+    font-style: italic;
+    position: relative;
+    top: -2px;
+  }
+  
+  .feature-content h3 {
+    font-size: 21px;
+    margin-bottom: 10px;
+  }
+  
+  .feature-content h3 .icon { display: none; }
+  
+  .feature-content p {
+    font-size: 15px;
+    margin-bottom: 0;
+    line-height: 1.75;
+  }
+  
+  .feature-content strong {
+    background: linear-gradient(180deg, transparent 60%, rgba(245,158,11,0.25) 60%);
+    padding: 0 2px;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  
+  /* 深色区 strong - 纯黄色字（不加背景贴片） */
+  .value p strong {
+    background: none;
+    color: var(--warm);
+    font-weight: 600;
+    padding: 0;
+  }
+  
+  /* VALUE */
+  .value {
+    background: var(--ink);
+    color: white;
+    max-width: none;
+    padding: 100px 24px;
+  }
+  
+  .value-inner {
+    max-width: 920px;
+    margin: 0 auto;
+  }
+  
+  .value .section-label {
+    color: var(--warm);
+  }
+  
+  .value .section-label::before {
+    background: var(--warm);
+  }
+  
+  .value h2 {
+    color: white;
+  }
+  
+  .value h2 .hl {
+    background: linear-gradient(180deg, transparent 65%, rgba(245,158,11,0.3) 65%);
+  }
+  
+  .value .lead {
+    color: rgba(255,255,255,0.7);
+    font-size: 17px;
+    max-width: 600px;
+    margin-bottom: 48px;
+  }
+  
+  .value-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 32px;
+    margin-top: 48px;
+  }
+  
+  .value-item {
+    border-top: 1px solid rgba(255,255,255,0.12);
+    padding-top: 20px;
+  }
+  
+  .value-item .v-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--warm);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  
+  .value-item p {
+    color: rgba(255,255,255,0.8);
+    font-size: 14.5px;
+    line-height: 1.7;
+  }
+  
+  /* SLOGAN */
+  .slogan {
+    background: var(--paper);
+    text-align: center;
+    max-width: none;
+    padding: 120px 24px;
+  }
+  
+  .slogan-quote {
+    max-width: 760px;
+    margin: 0 auto;
+    font-size: clamp(24px, 4.5vw, 40px);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    line-height: 1.35;
+    color: var(--ink);
+  }
+  
+  .slogan-quote .hl {
+    color: var(--warm-deep);
+  }
+  
+  .slogan-author {
+    margin-top: 32px;
+    font-size: 12px;
+    opacity: 0.4;
+    letter-spacing: 2px;
+    color: var(--ink);
+  }
+  
+  /* CTA */
+  .cta {
+    text-align: center;
+    background: var(--paper);
+    padding: 60px 24px 80px;
+  }
+  
+  .cta-tag {
+    display: inline-block;
+    padding: 10px 20px;
+    background: var(--ink);
+    color: white;
+    border-radius: 100px;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    font-weight: 500;
+    margin-bottom: 20px;
+  }
+  
+  .cta-text {
+    max-width: 520px;
+    margin: 0 auto;
+    color: var(--ink-soft);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  
+  .footer {
+    text-align: center;
+    padding: 32px 24px;
+    font-size: 11px;
+    color: var(--ink-faint);
+    background: var(--paper);
+    border-top: 1px solid var(--line);
+  }
+  
+  @media (max-width: 600px) {
+    section { padding: 64px 20px; }
+    .feature { grid-template-columns: 1fr; gap: 12px; }
+    .feature-num { font-size: 36px; }
+    .pain-grid { gap: 12px; }
+    .pain-card { padding: 22px 18px; }
+    .mode-card { padding: 24px 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-content">
+    <!-- 抽象主视觉 - 月相 + 心形融化为对话气泡 -->
+    <svg class="hero-mark" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="grad" x1="0" y1="0" x2="96" y2="96" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#4F46E5"/>
+          <stop offset="1" stop-color="#F59E0B"/>
+        </linearGradient>
+      </defs>
+      <!-- 两个对话气泡交叠 -->
+      <path d="M28 24a14 14 0 0 1 14-14h22a14 14 0 0 1 14 14v12a14 14 0 0 1-14 14H42l-10 8v-8h-4a14 14 0 0 1 0-28" stroke="url(#grad)" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <circle cx="36" cy="30" r="2" fill="#4F46E5"/>
+      <circle cx="46" cy="30" r="2" fill="#4F46E5"/>
+      <circle cx="56" cy="30" r="2" fill="#F59E0B"/>
+      <!-- 心形融化 -->
+      <path d="M58 56c-3-5-10-8-15-3s-3 11 4 14l11 6 11-6c7-3 9-9 4-14s-12-2-15 3z" fill="url(#grad)" opacity="0.85"/>
+    </svg>
+    
+    <span class="badge"><span class="dot"></span>生活娱乐赛道 · 2026</span>
+    <h1>分手冷静室</h1>
+    <p class="tagline">深夜想发那条消息之前，<br>先让你的 AI 帮你看清楚——该不该发，怎么发，发完会怎样。</p>
+    <div class="positioning">不替你说话，替你把关 ✦</div>
+  </div>
+  <div class="scroll-hint">↓</div>
+</div>
+
+<!-- PAIN -->
+<section class="pain">
+  <div class="pain-inner">
+    <div class="section-label">痛点</div>
+    <h2>凌晨两点到五点，<br>是一段关系<span class="hl">最危险的时刻</span>。</h2>
+    <p>深夜吵架后，<strong>反复翻聊天记录、想发又不敢发、发了又后悔</strong>——这是几乎所有恋爱中的人都经历过的死循环。</p>
+    <p>研究表明，超过 80% 的"冲动型分手"和"冲动型复合"都发生在深夜。第二天清醒过来，只剩下一句：<em style="color: var(--warm-deep); font-style: italic;">"我昨晚到底在干嘛？？"</em></p>
+    
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </div>
+        <h3>深夜脑子不清醒</h3>
+        <p>凌晨大脑前额叶功能下降，做出的决定 80% 都会后悔。</p>
+      </div>
+      
+      <div class="pain-card">
+        <div class="icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="7" y="2" width="10" height="20" rx="2"/>
+            <line x1="11" y1="18" x2="13" y2="18"/>
+            <path d="M9 6h6M9 9h3"/>
+          </svg>
+        </div>
+        <h3>反复刷聊天记录</h3>
+        <p>翻完一遍又一遍，越翻越上头，越上头越想发消息。</p>
+      </div>
+      
+      <div class="pain-card">
+        <div class="icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="9" r="3.5"/>
+            <path d="M5 21c0-3.5 3.5-6 7-6s7 2.5 7 6"/>
+          </svg>
+        </div>
+        <h3>找不到人客观分析</h3>
+        <p>朋友会偏袒你，前任会激怒你，自己分析只会越分析越乱。</p>
+      </div>
+      
+      <div class="pain-card">
+        <div class="icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M9 9h.01M15 9h.01M9 15c1 1 2 1.5 3 1.5s2-.5 3-1.5"/>
+          </svg>
+        </div>
+        <h3>找不到能好好说话的人</h3>
+        <p>朋友会觉得你烦，前任只会激怒你，自己扛着越扛越极端。最后不是拉黑删人，就是开始想象"如果有个完美 AI 伴侣"。</p>
+      </div>
+      
+      <div class="pain-card">
+        <div class="icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <path d="M8 13l2 2 4-4"/>
+          </svg>
+        </div>
+        <h3>从来不复盘模式</h3>
+        <p>每次吵完都说"下次改"，但下次还是会踩同样的坑。</p>
+      </div>
+      
+      <div class="pain-card">
+        <div class="icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 0 1 16-5.7L21 4M21 4v6h-6"/>
+            <path d="M21 12a9 9 0 0 1-16 5.7L3 20M3 20v-6h6"/>
+          </svg>
+        </div>
+        <h3>复合后重蹈覆辙</h3>
+        <p>和好一周又开始吵，因为没解决核心问题，只是情绪过去了。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section class="solution">
+  <div class="solution-inner">
+    <div class="section-label">解法</div>
+    <h2>不是陪聊，是<span class="hl">帮你想清楚</span>。</h2>
+    <p class="solution-intro">分手冷静室不让你找人倾诉，也不让你发疯。我们给你的，是一个会陪你聊天、但更会<strong>帮你看清自己</strong>的 AI。它会问你问题，会指出你看不到的盲区，会在你做决定之前给你一个缓冲。</p>
+    
+    <div class="mode-card">
+      <span class="mode-tag">冲突拦截</span>
+      <h4>想发那条消息？AI 先问你三个问题</h4>
+      <p>不是劝你别发，而是问你：① 你希望对方看到后什么反应？② 如果没达到你会怎样？③ 这条消息本质是"沟通"还是"情绪宣泄"？问完你自己就有答案了。</p>
+    </div>
+    
+    <div class="mode-card">
+      <span class="mode-tag">盲区分析</span>
+      <h4>你看不到的模式，帮你看见</h4>
+      <p>你以为自己吵赢了，AI 会调出复盘记录告诉你："这次争吵里你说了三次'你从来都不'，但其实对方上周三给你点过外卖。"帮你在情绪外看到自己的行为模式。</p>
+    </div>
+    
+    <div class="mode-card">
+      <span class="mode-tag">7 天复盘</span>
+      <h4>生成一份《你的关系体检报告》</h4>
+      <p>记录你这 7 天说的气话、想发没发的话、实际发出去的话，生成结构化报告：争吵触发点、情绪峰值时段、对方的高频雷区、你最容易犯的三个错。下次吵之前自动预警。</p>
+    </div>
+    
+    <div class="mode-card">
+      <span class="mode-tag">决策辅助</span>
+      <h4>该挽回还是该放手？帮你想清楚</h4>
+      <p>不灌鸡汤，不做和事佬。输入对方 5 个核心行为模式，AI 输出客观评估：这段关系的"沉没成本 vs 未来预期"。我们不会告诉你"AI 比真人好"或"别找 AI 找真人"——那都是回避问题。AI 帮你看清自己，看清对方，看清这段关系真实的样子。然后<strong>你自己决定</strong>。</p>
+    </div>
+  </div>
+</section>
+
+<!-- USERS -->
+<section class="users">
+  <div class="users-inner">
+    <div class="section-label">为谁</div>
+    <h2>谁会需要它？</h2>
+    <ul class="user-list">
+      <li>
+        <div class="user-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="8" r="3"/>
+            <circle cx="16" cy="8" r="3"/>
+            <path d="M3 20c0-3 3-5 6-5s6 2 6 5M14 20c0-2 2-4 5-4s5 2 5 4"/>
+          </svg>
+        </div>
+        <div class="user-text">
+          <strong>18-35 岁的恋爱中 / 刚分手人群</strong>
+          <span>情感波动期最需要被接住，又最害怕被评判。</span>
+        </div>
+      </li>
+      <li>
+        <div class="user-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            <path d="M9 13l2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="user-text">
+          <strong>深夜情绪化的"发疯型选手"</strong>
+          <span>白天理性、晚上失控，吵架当晚特别需要一个缓冲带。</span>
+        </div>
+      </li>
+      <li>
+        <div class="user-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 21c0-4.5 4-7 8-7s8 2.5 8 7"/>
+            <path d="M9 8h6"/>
+          </svg>
+        </div>
+        <div class="user-text">
+          <strong>回避型 & 焦虑型依恋人格</strong>
+          <span>两种最容易反复拉扯、最需要被温柔介入的人群。</span>
+        </div>
+      </li>
+      <li>
+        <div class="user-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="6" cy="6" r="3"/>
+            <circle cx="18" cy="6" r="3"/>
+            <path d="M3 21v-2c0-3 2-5 5-5M21 21v-2c0-3-2-5-5-5"/>
+            <line x1="9" y1="13" x2="15" y2="13"/>
+          </svg>
+        </div>
+        <div class="user-text">
+          <strong>长期冷战中的夫妻</strong>
+          <span>不是不爱了，是不知道怎么开口。</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="section-label">功能</div>
+  <h2>六个功能，<br>陪你熬过<span class="hl">最难的那 7 天</span>。</h2>
+  
+  <div class="feature">
+    <div class="feature-num">01</div>
+    <div class="feature-content">
+      <h3>发疯指数仪表盘</h3>
+      <p>打字或语音倾诉，AI 实时评估情绪等级（1-10）。超过 7 级自动锁定 30 分钟，弹窗提醒："现在说的话，明天醒来你会想删。"</p>
+    </div>
+  </div>
+  
+  <div class="feature">
+    <div class="feature-num">02</div>
+    <div class="feature-content">
+      <h3>凌晨锁</h3>
+      <p>0:00-6:00 之间的敏感操作（联系对方、发朋友圈伤感内容）需要先做 3 道冷静题，不通过直接锁死到天亮。</p>
+    </div>
+  </div>
+  
+  <div class="feature">
+    <div class="feature-num">03</div>
+    <div class="feature-content">
+      <h3>冲突拦截</h3>
+      <p>想发消息？AI 不问"该不该发"，而是问<strong>三个结构化问题</strong>，让你自己看清这是沟通还是情绪宣泄。</p>
+    </div>
+  </div>
+  
+  <div class="feature">
+    <div class="feature-num">04</div>
+    <div class="feature-content">
+      <h3>盲区分析</h3>
+      <p>调出复盘记录，AI 指出你看不到的模式："你这次吵赢是因为对方让步，但对方让步 3 次后会爆发。"</p>
+    </div>
+  </div>
+  
+  <div class="feature">
+    <div class="feature-num">05</div>
+    <div class="feature-content">
+      <h3>7 天关系体检报告</h3>
+      <p>7 天后输出结构化报告：争吵触发点、情绪峰值时段、对方的高频雷区、你最容易犯的三个错。下次吵之前自动预警。</p>
+    </div>
+  </div>
+  
+  <div class="feature">
+    <div class="feature-num">06</div>
+    <div class="feature-content">
+      <h3>挽回 / 放手决策辅助</h3>
+      <p>不灌鸡汤。输入对方 5 个核心行为模式，AI 输出<strong>"沉没成本 vs 未来预期"</strong>客观评估，再做决定。</p>
+    </div>
+  </div>
+</section>
+
+<!-- VALUE -->
+<section class="value">
+  <div class="value-inner">
+    <div class="section-label">价值</div>
+    <h2>为什么<span class="hl">值得做</span>？</h2>
+    <p class="lead">这不是又一个社交 App，而是装在你手机里的情感教练——比朋友更客观，比咨询师更便宜，比深夜自己扛着更不孤单。</p>
+    
+    <div class="value-grid">
+      <div class="value-item">
+        <div class="v-label">社会价值</div>
+        <p>降低"冲动型分手 / 冲动型复合"的发生率。让"冷静"不再是一件孤独、羞耻、需要求人的事。</p>
+      </div>
+      <div class="value-item">
+        <div class="v-label">效率价值</div>
+        <p>替代朋友 80% 的倾听工作，但提供朋友给不了的<strong>结构化分析</strong>。把模糊的情绪变成可执行的下一步。</p>
+      </div>
+      <div class="value-item">
+        <div class="v-label">商业价值</div>
+        <p>C 端订阅（9.9/月 / 99/年）+ 企业 EAP（员工心理援助）+ 婚恋机构 B 端 SDK。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLOGAN -->
+<section class="slogan">
+  <div class="slogan-quote">
+    深夜想发的消息，<br>
+    多数<span class="hl">不如等到天亮</span>。
+  </div>
+  <div class="slogan-author">分手冷静室 · 2026</div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <span class="cta-tag">TRAE AI CREATIVITY COMPETITION</span>
+  <p class="cta-text">报名赛道 · 生活娱乐<br>愿每一份深夜的冲动，都能等到天亮。<br><em style="color: var(--warm-deep); font-style: italic;">AI 帮你冷静，但别让 AI 替你爱。</em></p>
+</section>
+
+<div class="footer">
+  分手冷静室 · 让你别在深夜做决定 · 2026
+</div>
+
+</body>
+</html>

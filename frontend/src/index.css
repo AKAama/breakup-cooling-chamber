@@ -1,0 +1,95 @@
+:root {
+  --indigo: #4f46e5;
+  --indigo-soft: #818cf8;
+  --indigo-deep: #3730a3;
+  --paper: #fafaf7;
+  --paper-deep: #f0efe8;
+  --ink: #1f1f2e;
+  --ink-soft: #52525b;
+  --ink-faint: #a1a1aa;
+  --warm: #f59e0b;
+  --warm-deep: #d97706;
+  --line: #e4e4e7;
+  --danger: #dc2626;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* 首页暖色主题 */
+.homepage {
+  background: #1a1308;
+  color: #fef3c7;
+}
+
+.homepage body {
+  background: #1a1308;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* 响应式：移动端适配 */
+@media (max-width: 768px) {
+  .feature-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+    direction: ltr !important;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 32px !important;
+  }
+
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+
+  .nav-desktop {
+    display: none !important;
+  }
+}

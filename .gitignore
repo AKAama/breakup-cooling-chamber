@@ -1,0 +1,25 @@
+# 依赖
+node_modules/
+backend/node_modules/
+
+# 环境变量
+.env
+backend/.env
+frontend/.env
+*.env.local
+
+# 构建产物
+frontend/dist/
+backend/server
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 日志
+*.log
