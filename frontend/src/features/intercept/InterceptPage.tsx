@@ -276,7 +276,7 @@ function ChatInputBar({ onSend, disabled }: { onSend: (t: string) => void; disab
   const [value, setValue] = useState('');
   const handleSend = () => { if (!value.trim()) return; onSend(value.trim()); setValue(''); };
   return (
-    <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: '12px 20px 28px', background: `linear-gradient(to top, ${C.bg} 60%, transparent)`, display: 'flex', gap: 10, zIndex: 100, maxWidth: 760, margin: '0 auto' }}>
+    <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: '12px 20px 28px', background: `linear-gradient(to top, ${C.bg} 60%, transparent)`, display: 'flex', gap: 10, zIndex: 100, maxWidth: '75%', margin: '0 auto' }}>
       <input value={value} onChange={(e) => setValue(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSend()}
         placeholder={disabled ? '军师正在思考...' : '继续和军师聊聊？'} disabled={disabled}
         style={{ flex: 1, padding: '14px 20px', borderRadius: 24, border: `1px solid ${C.cardBorder}`, background: 'rgba(255,200,150,0.05)', backdropFilter: 'blur(20px)', color: C.textMain, fontSize: 15, outline: 'none', transition: 'border-color 0.2s ease' }}
@@ -303,9 +303,17 @@ export function InterceptPage() {
   const [phase, setPhase] = useState<Phase>('analyzing');
   const [showDecision, setShowDecision] = useState(false);
   const [adviceDone, setAdviceDone] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const topRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [chatMessages, currentAIMessage, phase, analysis]);
+
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 400);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   useEffect(() => {
     if (!pendingMessage) { navigate('/', { replace: true }); return; }
@@ -413,7 +421,8 @@ export function InterceptPage() {
       </div>
 
       {/* 主体：时间线 + 内容 */}
-      <div style={{ maxWidth: 680, margin: '0 auto', padding: '40px 24px 120px' }}>
+      <div ref={topRef} />
+      <div style={{ maxWidth: '75%', margin: '0 auto', padding: '40px 24px 120px' }}>
         {STATIONS.map((s, i) => {
           const status = getStationStatus(s.id);
           if (status === 'pending') return null;
@@ -423,7 +432,7 @@ export function InterceptPage() {
           return (
             <div key={s.id} style={{ display: 'flex', marginBottom: isLast ? 0 : 40, animation: status === 'active' ? 'fadeInUp 0.5s ease' : 'none' }}>
               {/* 左侧：时间线节点列 */}
-              <div style={{ flexShrink: 0, width: 48, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ flexShrink: 0, width: 48, marginRight: 24, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 {/* 节点上半段线 */}
                 <div style={{ width: 2, flex: i === 0 ? '0 0 0px' : '1 1 0', background: i === 0 ? 'transparent' : C.cardBorder }} />
                 {/* 节点圆 */}
@@ -571,6 +580,27 @@ export function InterceptPage() {
 
       {/* 底部输入栏 */}
       {(phase === 'chatting' || phase === 'decision') && <ChatInputBar onSend={handleContinueSend} disabled={isAITyping} />}
+
+      {/* 回到顶部按钮 */}
+      {showScrollTop && (
+        <button
+          onClick={() => topRef.current?.scrollIntoView({ behavior: 'smooth' })}
+          style={{
+            position: 'fixed', bottom: 90, right: 32, width: 44, height: 44, borderRadius: '50%',
+            border: `1px solid ${C.cardBorder}`, background: 'rgba(26,19,8,0.8)', backdropFilter: 'blur(12px)',
+            color: C.textMain, cursor: 'pointer', zIndex: 90,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.3)', transition: 'all 0.2s ease',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.borderColor = C.primary; e.currentTarget.style.color = C.primary; }}
+          onMouseLeave={(e) => { e.currentTarget.style.borderColor = C.cardBorder; e.currentTarget.style.color = C.textMain; }}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="19" x2="12" y2="5" />
+            <polyline points="5 12 12 5 19 12" />
+          </svg>
+        </button>
+      )}
 
       {/* 动画 */}
       <style>{`
