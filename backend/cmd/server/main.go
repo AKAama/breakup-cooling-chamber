@@ -79,6 +79,7 @@ func main() {
 
 	api := r.Group("/api")
 	{
+		api.GET("/health", func(c *gin.Context) { c.JSON(200, gin.H{"status": "ok"}) })
 		api.POST("/intercept", interceptH.Intercept)       // v1 兼容接口
 		api.POST("/intercept/chat", interceptH.Chat)        // 流式第一轮
 		api.POST("/intercept/answer", interceptH.Answer)    // 流式回答后继续

@@ -12,6 +12,10 @@ frontend/.env
 frontend/dist/
 backend/server
 
+# docker-compose 本地覆盖文件（仅本地测试用，不入仓）
+docker-compose.override.yml
+backend/docker-compose.override.yml
+
 # IDE
 .idea/
 .vscode/

@@ -1,0 +1,49 @@
+# 服务器端部署用：PostgreSQL + 后端
+# 部署目录：/opt/breakup-cooling-chamber
+# 同目录下需要 .env 文件，提供 DEEPSEEK_KEY / DB_PASSWORD / ALLOWED_ORIGINS
+#
+# 首次部署：
+#   scp backend/docker-compose.yml  user@host:/opt/breakup-cooling-chamber/
+#   在服务器上创建 .env，然后 docker-compose up -d
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: bcc-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: cooling_chamber
+      TZ: Asia/Shanghai
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cooling_chamber"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    image: crpi-3xux8vqn35fw00z9.cn-shanghai.personal.cr.aliyuncs.com/project_hub/breakup-cooling-chamber:latest
+    container_name: bcc-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: 8080
+      GIN_MODE: release
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_NAME: cooling_chamber
+      DB_SSLMODE: disable
+      DEEPSEEK_KEY: ${DEEPSEEK_KEY}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
