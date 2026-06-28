@@ -277,9 +277,7 @@ function NavBar({ onNavigate }: { onNavigate: (path: string) => void }) {
 }
 
 // Hero 区域
-function HeroSection({ onAnalyze }: { onAnalyze: (msg: string) => void }) {
-  const [message, setMessage] = useState('');
-
+function HeroSection() {
   return (
     <section
       style={{
@@ -1328,7 +1326,7 @@ export function HomePage() {
     <div className="homepage" style={{ minHeight: '100vh', background: '#1a1308' }}>
       <NavBar onNavigate={handleNavigate} />
 
-      <HeroSection onAnalyze={handleAnalyze} />
+      <HeroSection />
 
       <InputSection onAnalyze={handleAnalyze} />
 

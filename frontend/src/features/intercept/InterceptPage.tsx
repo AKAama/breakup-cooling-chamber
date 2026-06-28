@@ -390,10 +390,6 @@ export function InterceptPage() {
     return 'done';
   };
 
-  const currentStationId = phase === 'analyzing' ? 'message' : phase === 'questions' ? 'questions' : phase === 'advising' ? 'advice' : 'decision';
-  const currentStationIdx = STATIONS.findIndex((s) => s.id === currentStationId);
-  const progressHeight = `${(currentStationIdx / (STATIONS.length - 1)) * 100}%`;
-
   const aiAdviceContent = chatMessages.filter((m) => m.role === 'assistant').map((m) => m.content).join('\n\n---\n\n');
 
   return (
