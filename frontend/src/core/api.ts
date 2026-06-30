@@ -9,8 +9,10 @@ import type {
   ChatMessage,
 } from '../types';
 
-// Axios 实例，baseURL 从环境变量读取，默认本地 8080
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080';
+// Axios 实例，baseURL 从环境变量读取。
+// 生产构建经 nginx 代理：VITE_API_BASE_URL=/api，前端请求 /api/xxx → 后端 :8080/api/xxx。
+// 本地开发回退到 http://localhost:8080/api（后端路由本身带 /api 前缀）。
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080/api';
 
 const http = axios.create({
   baseURL: API_BASE,
@@ -19,43 +21,43 @@ const http = axios.create({
 
 // 冲突拦截：POST /api/intercept
 export async function postIntercept(message: string): Promise<InterceptResult> {
-  const { data } = await http.post<InterceptResult>('/api/intercept', { message });
+  const { data } = await http.post<InterceptResult>('/intercept', { message });
   return data;
 }
 
 // 历史记录：GET /api/records
 export async function getHistory(): Promise<InterceptRecord[]> {
-  const { data } = await http.get<InterceptRecord[]>('/api/records');
+  const { data } = await http.get<InterceptRecord[]>('/records');
   return data;
 }
 
 // 写日记：POST /api/journal
 export async function postJournal(content: string, mood: number): Promise<JournalEntry> {
-  const { data } = await http.post<JournalEntry>('/api/journal', { content, mood });
+  const { data } = await http.post<JournalEntry>('/journal', { content, mood });
   return data;
 }
 
 // 日记列表：GET /api/journals
 export async function getJournals(): Promise<JournalEntry[]> {
-  const { data } = await http.get<JournalEntry[]>('/api/journals');
+  const { data } = await http.get<JournalEntry[]>('/journals');
   return data;
 }
 
 // 盲区分析：GET /api/insight
 export async function getInsight(): Promise<InsightResult> {
-  const { data } = await http.get<InsightResult>('/api/insight');
+  const { data } = await http.get<InsightResult>('/insight');
   return data;
 }
 
 // 7 天报告：GET /api/report（返回 Markdown 字符串）
 export async function getReport(): Promise<string> {
-  const { data } = await http.get<string>('/api/report');
+  const { data } = await http.get<string>('/report');
   return data;
 }
 
 // 决策辅助：POST /api/decide
 export async function postDecide(behaviors: string[], context?: string): Promise<DecideResult> {
-  const { data } = await http.post<DecideResult>('/api/decide', { behaviors, context });
+  const { data } = await http.post<DecideResult>('/decide', { behaviors, context });
   return data;
 }
 
@@ -66,7 +68,7 @@ export async function streamInterceptChat(
   onText: (text: string) => void,
   onDone: (suggestion?: string) => void
 ): Promise<void> {
-  const response = await fetch(`${API_BASE}/api/intercept/chat`, {
+  const response = await fetch(`${API_BASE}/intercept/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ message }),
@@ -138,7 +140,7 @@ export async function streamInterceptAnswer(
   onText: (text: string) => void,
   onDone: (suggestion?: string) => void
 ): Promise<void> {
-  const response = await fetch(`${API_BASE}/api/intercept/answer`, {
+  const response = await fetch(`${API_BASE}/intercept/answer`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ id, answers, history }),
