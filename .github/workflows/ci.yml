@@ -73,6 +73,14 @@ jobs:
             docker-compose pull
             docker-compose up -d --remove-orphans
             docker image prune -f
-            sleep 5
-            curl -sf -o /dev/null http://127.0.0.1:8080/api/health
-            echo "deploy ok"
+            # 轮询健康检查，最多等 60 秒；失败则打印容器日志便于排查
+            for i in $(seq 1 30); do
+              if curl -sf -o /dev/null http://127.0.0.1:8080/api/health; then
+                echo "deploy ok"
+                exit 0
+              fi
+              sleep 2
+            done
+            echo "!!! health check failed, dumping backend logs:"
+            docker logs bcc-backend --tail 80
+            exit 1
